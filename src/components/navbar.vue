@@ -17,6 +17,9 @@
                     <b-nav-item @click="onNavToExternalEIPWorkUpdates" href="#">Work Updates</b-nav-item>
                     <b-nav-item @click="onNavToExternalBlockExplorer" href="#">Block Explorer</b-nav-item>
                     <b-nav-item @click="onNavToExternalNetworkStatus" href="#">Network Status</b-nav-item>
+                    <b-button @click="$bvToast.show('qrcode-toast')" class="mb-2" variant="primary">
+                        Get QR code
+                    </b-button>
                 </b-nav-form>
             </b-navbar-nav>
         </b-collapse>

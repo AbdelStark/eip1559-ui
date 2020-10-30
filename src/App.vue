@@ -2,11 +2,14 @@
     <div id="app">
         <navbar
                 :on-nav-to-block="onNavToBlock"
-                :on-nav-to-transaction="onNavToTransaction"
+                :on-nav-to-external-block-explorer="onNavToExternalBlockExplorer"
                 :on-nav-to-external-e-i-p-specification="onNavToExternalEIPSpecification"
                 :on-nav-to-external-e-i-p-work-updates="onNavToExternalEIPWorkUpdates"
-                :on-nav-to-external-block-explorer="onNavToExternalBlockExplorer"
-                :on-nav-to-external-network-status="onNavToExternalNetworkStatus"/>
+                :on-nav-to-external-network-status="onNavToExternalNetworkStatus"
+                :on-nav-to-transaction="onNavToTransaction"/>
+        <b-toast id="qrcode-toast" no-auto-hide static>
+            <img height="256" src="/qr-code.png" width="256">
+        </b-toast>
         <b-jumbotron header="EIP-1559 Toolbox" lead="Fee market change for ETH 1.0 chain">
             <p>
                 This EIP introduces a transaction pricing mechanism that includes fixed-per-block network fee that is
@@ -26,8 +29,8 @@
                         <b-form-input
                                 id="input-private-key"
                                 placeholder="Enter private key"
-                                type="password"
                                 required
+                                type="password"
                                 v-model="formSubmitTransaction.privateKey"
                         ></b-form-input>
                     </b-form-group>
@@ -37,14 +40,14 @@
                             label-for="input-nonce"
                     >
                         <b-form-input
-                                id="input-nonce"
-                                placeholder="Enter nonce"
                                 :disabled="formSubmitTransaction.transaction.autoNonce"
                                 :required="!formSubmitTransaction.transaction.autoNonce"
+                                id="input-nonce"
+                                placeholder="Enter nonce"
                                 v-model="formSubmitTransaction.transaction.nonce"
                         ></b-form-input>
-                        <b-form-checkbox v-model="formSubmitTransaction.transaction.autoNonce" switch size="lg"
-                                         @change="onChangeAutoNonce">Auto
+                        <b-form-checkbox @change="onChangeAutoNonce" size="lg" switch
+                                         v-model="formSubmitTransaction.transaction.autoNonce">Auto
                         </b-form-checkbox>
                     </b-form-group>
 
@@ -63,7 +66,7 @@
                                 v-model="formSubmitTransaction.transaction.value"
                         ></b-form-input>
                     </b-form-group>
-                    <b-form-checkbox v-model="formSubmitTransaction.transaction.isEIP1559" switch size="lg">EIP-1559
+                    <b-form-checkbox size="lg" switch v-model="formSubmitTransaction.transaction.isEIP1559">EIP-1559
                     </b-form-checkbox>
                     <b-form-group label="Gas limit:" label-for="input-gas-limit">
                         <b-form-input
@@ -74,25 +77,25 @@
                     </b-form-group>
                     <b-form-group label="Gas price:" label-for="input-gas-price">
                         <b-form-input
-                                id="input-gas-price"
-                                :required="!formSubmitTransaction.transaction.isEIP1559"
                                 :disabled="formSubmitTransaction.transaction.isEIP1559"
+                                :required="!formSubmitTransaction.transaction.isEIP1559"
+                                id="input-gas-price"
                                 v-model="formSubmitTransaction.transaction.gasPrice"
                         ></b-form-input>
                     </b-form-group>
                     <b-form-group label="Miner bribe:" label-for="input-miner-bribe">
                         <b-form-input
-                                id="input-miner-bribe"
-                                :required="formSubmitTransaction.transaction.isEIP1559"
                                 :disabled="!formSubmitTransaction.transaction.isEIP1559"
+                                :required="formSubmitTransaction.transaction.isEIP1559"
+                                id="input-miner-bribe"
                                 v-model="formSubmitTransaction.transaction.minerBribe"
                         ></b-form-input>
                     </b-form-group>
                     <b-form-group label="Fee cap:" label-for="input-fee-cap">
                         <b-form-input
-                                id="input-fee-cap"
-                                :required="formSubmitTransaction.transaction.isEIP1559"
                                 :disabled="!formSubmitTransaction.transaction.isEIP1559"
+                                :required="formSubmitTransaction.transaction.isEIP1559"
+                                id="input-fee-cap"
                                 v-model="formSubmitTransaction.transaction.feecap"
                         ></b-form-input>
                     </b-form-group>
@@ -131,15 +134,43 @@
                 {{successAlertMessage}}
             </b-alert>
         </b-jumbotron>
+        <!-- Footer -->
+        <mdb-footer class="font-small pt-4 mt-4" color="blue">
+            <mdb-container class="text-left">
+                <mdb-row>
+                    <mdb-col class="mb-2">
+                        <a class="mr-2" href="https://github.com/abdelhamidbakhta/eip1559-ui"><img
+                                height="32" src="/logos/github.png" width="32"></a>
+                        <a class="mr-2" href="https://discord.gg/hrBUGu78Sf"><img height="32" src="/logos/discord.png"
+                                                                                  width="32"></a>
+                        <a class="mr-2" href="mailto:abdelhamid.bakhta@consensys.net"><img height="32"
+                                                                                           src="/logos/gmail.png" width="32"></a>
+                    </mdb-col>
+                </mdb-row>
+            </mdb-container>
+            <div class="footer-copyright text-center py-3">
+                <mdb-container fluid>
+                    &copy; 2020 Copyright: <a href="https://consensys.net/"> ConsenSys </a>
+                </mdb-container>
+            </div>
+        </mdb-footer>
+        <!-- Footer -->
     </div>
 </template>
 
 <script>
     import Navbar from "./components/navbar";
+    import {mdbCol, mdbContainer, mdbFooter, mdbRow} from 'mdbvue';
 
     const axios = require('axios').default;
     export default {
-        components: {Navbar},
+        components: {
+            Navbar,
+            mdbFooter,
+            mdbContainer,
+            mdbRow,
+            mdbCol
+        },
         data() {
             return {
                 config: configuration(),
