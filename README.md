@@ -21,7 +21,7 @@ This web interface comes with [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559
 ### Install from source
 
 ```shell script
-npm install -g
+npm install
 ```
 
 ### Run the web interface

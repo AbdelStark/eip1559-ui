@@ -66,7 +66,26 @@
 
             <b-card class="mt-3" header="Block management" v-if="showBlockPanel">
                 <b-form>
-
+                    <b-form @submit="onSubmitGetBaseFee">
+                        <b-form-group
+                                id="input-group-block-number"
+                                label="Block number:"
+                                label-for="input-block-number"
+                        >
+                            <b-form-input
+                                    id="input-block-number"
+                                    placeholder="enter block number or one of earliest, latest"
+                                    required
+                                    v-model="formGetBaseFee.block.number"
+                            ></b-form-input>
+                        </b-form-group>
+                        <b-form-group>
+                            <b-button class="mr-2" type="submit" variant="primary">Get base fee</b-button>
+                            <h2 v-if="result.getBaseFee.displayBaseFee">
+                                <b-badge>{{result.getBaseFee.baseFee}}</b-badge>
+                            </h2>
+                        </b-form-group>
+                    </b-form>
                 </b-form>
             </b-card>
         </b-jumbotron>
@@ -74,12 +93,24 @@
 </template>
 
 <script>
-
+    const axios = require('axios').default;
     export default {
         data() {
             return {
+                config: {
+                    apiGwRoot: 'http://eip1559-tx.ops.pegasys.tech:8080/',
+                },
                 formSubmitTransaction: {
                     transaction: newTransaction(),
+                },
+                formGetBaseFee: {
+                    block: newBlock(),
+                },
+                result: {
+                    getBaseFee: {
+                        displayBaseFee: false,
+                        baseFee: 0,
+                    }
                 },
                 showSuccessAlert: false,
                 successAlertMessage: '',
@@ -102,6 +133,7 @@
                 evt.preventDefault();
                 // Reset our form values
                 this.formSubmitTransaction.transaction = newTransaction();
+                this.formGetBaseFee.block = newBlock();
                 this.showSuccessAlert = false;
                 this.successAlertMessage = '';
                 // Trick to reset/clear native browser form validation state
@@ -109,6 +141,22 @@
                 this.$nextTick(() => {
                     this.showTransactionPanel = true;
                 })
+            },
+            onSubmitGetBaseFee(evt) {
+                evt.preventDefault();
+                console.log(this.formGetBaseFee.block.number);
+                const currentVue = this;
+                axios.get(`${this.config.apiGwRoot}/basefee/${this.formGetBaseFee.block.number}`)
+                    .then(function (response) {
+                        // handle success
+                        console.log(response.data);
+                        currentVue.result.getBaseFee.baseFee = response.data.baseFee;
+                        currentVue.result.getBaseFee.displayBaseFee = true;
+                    })
+                    .catch(function (error) {
+                        // handle error
+                        console.log(error);
+                    });
             },
             onNavToTransaction() {
                 this.showTransactionPanel = true;
@@ -127,4 +175,11 @@
             to: '',
         };
     }
+
+    function newBlock() {
+        return {
+            number: 'latest',
+        };
+    }
+
 </script>
