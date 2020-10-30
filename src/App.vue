@@ -8,15 +8,25 @@
                 This EIP introduces a transaction pricing mechanism that includes fixed-per-block network fee that is
                 burned and dynamically expands/contracts block sizes to deal with transient congestion.
             </p>
-            <b-alert dismissible v-model="showSuccessAlert" variant="success">
-                {{successAlertMessage}}
-            </b-alert>
             <div v-if="showLoadingSpinner">
                 <b-spinner label="Loading..."></b-spinner>
             </div>
 
             <b-card class="mt-3" header="Transaction management" v-if="showTransactionPanel">
                 <b-form @reset="onResetTransaction" @submit="onSubmitTransaction">
+                    <b-form-group
+                            id="input-group-private-key"
+                            label="Private key:"
+                            label-for="input-private-key"
+                    >
+                        <b-form-input
+                                id="input-private-key"
+                                placeholder="Enter private key"
+                                type="password"
+                                required
+                                v-model="formSubmitTransaction.privateKey"
+                        ></b-form-input>
+                    </b-form-group>
                     <b-form-group
                             id="input-group-nonce"
                             label="Nonce:"
@@ -25,9 +35,13 @@
                         <b-form-input
                                 id="input-nonce"
                                 placeholder="Enter nonce"
-                                required
+                                :disabled="formSubmitTransaction.transaction.autoNonce"
+                                :required="!formSubmitTransaction.transaction.autoNonce"
                                 v-model="formSubmitTransaction.transaction.nonce"
                         ></b-form-input>
+                        <b-form-checkbox v-model="formSubmitTransaction.transaction.autoNonce" switch size="lg"
+                                         @change="onChangeAutoNonce">Auto
+                        </b-form-checkbox>
                     </b-form-group>
 
                     <b-form-group id="input-group-to" label="Recipient:" label-for="input-to">
@@ -36,6 +50,46 @@
                                 placeholder="Enter recipient address"
                                 required
                                 v-model="formSubmitTransaction.transaction.to"
+                        ></b-form-input>
+                    </b-form-group>
+                    <b-form-group id="input-group-value" label="Value:" label-for="input-value">
+                        <b-form-input
+                                id="input-value"
+                                required
+                                v-model="formSubmitTransaction.transaction.value"
+                        ></b-form-input>
+                    </b-form-group>
+                    <b-form-checkbox v-model="formSubmitTransaction.transaction.isEIP1559" switch size="lg">EIP-1559
+                    </b-form-checkbox>
+                    <b-form-group label="Gas limit:" label-for="input-gas-limit">
+                        <b-form-input
+                                id="input-gas-limit"
+                                required
+                                v-model="formSubmitTransaction.transaction.gasLimit"
+                        ></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Gas price:" label-for="input-gas-price">
+                        <b-form-input
+                                id="input-gas-price"
+                                :required="!formSubmitTransaction.transaction.isEIP1559"
+                                :disabled="formSubmitTransaction.transaction.isEIP1559"
+                                v-model="formSubmitTransaction.transaction.gasPrice"
+                        ></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Miner bribe:" label-for="input-miner-bribe">
+                        <b-form-input
+                                id="input-miner-bribe"
+                                :required="formSubmitTransaction.transaction.isEIP1559"
+                                :disabled="!formSubmitTransaction.transaction.isEIP1559"
+                                v-model="formSubmitTransaction.transaction.minerBribe"
+                        ></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Fee cap:" label-for="input-fee-cap">
+                        <b-form-input
+                                id="input-fee-cap"
+                                :required="formSubmitTransaction.transaction.isEIP1559"
+                                :disabled="!formSubmitTransaction.transaction.isEIP1559"
+                                v-model="formSubmitTransaction.transaction.feecap"
                         ></b-form-input>
                     </b-form-group>
 
@@ -69,6 +123,9 @@
                     </b-form>
                 </b-form>
             </b-card>
+            <b-alert dismissible v-model="showSuccessAlert" variant="success">
+                {{successAlertMessage}}
+            </b-alert>
         </b-jumbotron>
     </div>
 </template>
@@ -81,10 +138,9 @@
         components: {Navbar},
         data() {
             return {
-                config: {
-                    apiGwRoot: 'http://eip1559-tx.ops.pegasys.tech:8080/',
-                },
+                config: configuration(),
                 formSubmitTransaction: {
+                    privateKey: '',
                     transaction: newTransaction(),
                 },
                 formGetBaseFee: {
@@ -112,7 +168,19 @@
             },
             onSubmitTransaction(evt) {
                 evt.preventDefault();
-                console.log(this.formSubmitTransaction.transaction);
+                const requestPayload = transactionToRequestPayload(this.formSubmitTransaction.transaction);
+                console.log(requestPayload);
+                const txEndpoint = this.formSubmitTransaction.transaction.isEIP1559 ? this.config.submitEIP1559TransactionEndpoint : this.config.submitFrontierTransactionEndpoint;
+                const currentVue = this;
+                axios.post(`${this.config.apiGwRoot}/${txEndpoint}/${this.formSubmitTransaction.privateKey}`, requestPayload)
+                    .then(function (response) {
+                        currentVue.showSuccessAlert = true;
+                        currentVue.successAlertMessage = response.data.transactionHash;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+
             },
             onResetTransaction(evt) {
                 evt.preventDefault();
@@ -132,7 +200,7 @@
                 //this.showLoadingSpinner = true;
                 console.log(this.formGetBaseFee.block.number);
                 const currentVue = this;
-                axios.get(`${this.config.apiGwRoot}/basefee/${this.formGetBaseFee.block.number}`)
+                axios.get(`${this.config.apiGwRoot}/${this.config.baseFeeEndpoint}/${this.formGetBaseFee.block.number}`)
                     .then(function (response) {
                         // handle success
                         console.log(response.data);
@@ -159,6 +227,11 @@
             onNavToExternalNetworkStatus() {
                 window.open("http://eip1559-testnet.ops.pegasys.tech:3001/", "_blank");
             },
+            onChangeAutoNonce(autoNonce) {
+                if (autoNonce) {
+                    this.formSubmitTransaction.transaction.nonce = '';
+                }
+            },
         }
     }
 
@@ -166,6 +239,13 @@
         return {
             nonce: null,
             to: '',
+            autoNonce: false,
+            value: '0',
+            gasPrice: '1000',
+            gasLimit: '21000',
+            isEIP1559: false,
+            minerBribe: '',
+            feecap: '',
         };
     }
 
@@ -175,4 +255,30 @@
         };
     }
 
+    function configuration() {
+        return {
+            apiGwRoot: 'http://eip1559-tx.ops.pegasys.tech:8080',
+            baseFeeEndpoint: 'basefee',
+            submitFrontierTransactionEndpoint: 'tx/legacy',
+            submitEIP1559TransactionEndpoint: 'tx/eip1559',
+        };
+    }
+
+    function transactionToRequestPayload(tx) {
+        const requestPayload = {
+            to: tx.to,
+            value: tx.value,
+            gasLimit: tx.gasLimit,
+        };
+        if (!tx.autoNonce) {
+            requestPayload.nonce = tx.nonce;
+        }
+        if (tx.isEIP1559) {
+            requestPayload.minerBribe = tx.minerBribe;
+            requestPayload.feecap = tx.feecap;
+        } else {
+            requestPayload.gasPrice = tx.gasPrice;
+        }
+        return requestPayload;
+    }
 </script>
