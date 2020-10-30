@@ -13,6 +13,8 @@
             <!-- Right aligned nav items -->
             <b-navbar-nav class="ml-auto">
                 <b-nav-form>
+                    <b-nav-item @click="onNavToExternalEIPSpecification" href="#">Specification</b-nav-item>
+                    <b-nav-item @click="onNavToExternalEIPWorkUpdates" href="#">Work Updates</b-nav-item>
                     <b-nav-item @click="onNavToExternalBlockExplorer" href="#">Block Explorer</b-nav-item>
                     <b-nav-item @click="onNavToExternalNetworkStatus" href="#">Network Status</b-nav-item>
                 </b-nav-form>
@@ -24,7 +26,7 @@
 <script>
     export default {
         name: "navbar",
-        props: ["onNavToTransaction", "onNavToBlock", "onNavToExternalBlockExplorer", "onNavToExternalNetworkStatus"],
+        props: ["onNavToTransaction", "onNavToBlock", "onNavToExternalBlockExplorer", "onNavToExternalNetworkStatus", "onNavToExternalEIPSpecification", "onNavToExternalEIPWorkUpdates"],
     }
 </script>
 

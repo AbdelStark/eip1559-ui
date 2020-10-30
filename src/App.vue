@@ -1,9 +1,13 @@
 <template>
     <div id="app">
-        <navbar :on-nav-to-block="onNavToBlock" :on-nav-to-transaction="onNavToTransaction"
+        <navbar
+                :on-nav-to-block="onNavToBlock"
+                :on-nav-to-transaction="onNavToTransaction"
+                :on-nav-to-external-e-i-p-specification="onNavToExternalEIPSpecification"
+                :on-nav-to-external-e-i-p-work-updates="onNavToExternalEIPWorkUpdates"
                 :on-nav-to-external-block-explorer="onNavToExternalBlockExplorer"
                 :on-nav-to-external-network-status="onNavToExternalNetworkStatus"/>
-        <b-jumbotron header="EIP-1559" lead="Fee market change for ETH 1.0 chain">
+        <b-jumbotron header="EIP-1559 Toolbox" lead="Fee market change for ETH 1.0 chain">
             <p>
                 This EIP introduces a transaction pricing mechanism that includes fixed-per-block network fee that is
                 burned and dynamically expands/contracts block sizes to deal with transient congestion.
@@ -221,16 +225,22 @@
                 this.showTransactionPanel = false;
                 this.showBlockPanel = true;
             },
+            onChangeAutoNonce(autoNonce) {
+                if (autoNonce) {
+                    this.formSubmitTransaction.transaction.nonce = '';
+                }
+            },
             onNavToExternalBlockExplorer() {
                 window.open("http://eip1559-testnet.ops.pegasys.tech:3000/", "_blank");
             },
             onNavToExternalNetworkStatus() {
                 window.open("http://eip1559-testnet.ops.pegasys.tech:3001/", "_blank");
             },
-            onChangeAutoNonce(autoNonce) {
-                if (autoNonce) {
-                    this.formSubmitTransaction.transaction.nonce = '';
-                }
+            onNavToExternalEIPSpecification() {
+                window.open("https://eips.ethereum.org/EIPS/eip-1559", "_blank");
+            },
+            onNavToExternalEIPWorkUpdates() {
+                window.open("https://hackmd.io/@timbeiko/1559-updates/", "_blank");
             },
         }
     }
