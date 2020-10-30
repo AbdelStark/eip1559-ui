@@ -1,30 +1,8 @@
 <template>
     <div id="app">
-        <b-navbar toggleable="lg" type="dark" variant="info">
-            <b-navbar-brand href="#">Ethereum</b-navbar-brand>
-
-            <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-
-            <b-collapse id="nav-collapse" is-nav>
-                <b-navbar-nav>
-                    <b-nav-item @click="onNavToTransaction" href="#">Transaction</b-nav-item>
-                    <b-nav-item @click="onNavToBlock" href="#">Block</b-nav-item>
-                </b-navbar-nav>
-
-                <!-- Right aligned nav items -->
-                <b-navbar-nav class="ml-auto">
-                    <b-nav-form>
-                        <b-form-input class="mr-sm-2" placeholder="Search" size="sm"></b-form-input>
-                        <b-button class="my-2 my-sm-0" size="sm" type="submit">Search</b-button>
-                    </b-nav-form>
-
-                    <b-nav-item-dropdown right text="Lang">
-                        <b-dropdown-item href="#">EN</b-dropdown-item>
-                        <b-dropdown-item href="#">FR</b-dropdown-item>
-                    </b-nav-item-dropdown>
-                </b-navbar-nav>
-            </b-collapse>
-        </b-navbar>
+        <navbar :on-nav-to-block="onNavToBlock" :on-nav-to-transaction="onNavToTransaction"
+                :on-nav-to-external-block-explorer="onNavToExternalBlockExplorer"
+                :on-nav-to-external-network-status="onNavToExternalNetworkStatus"/>
         <b-jumbotron header="EIP-1559" lead="Fee market change for ETH 1.0 chain">
             <p>
                 This EIP introduces a transaction pricing mechanism that includes fixed-per-block network fee that is
@@ -33,6 +11,9 @@
             <b-alert dismissible v-model="showSuccessAlert" variant="success">
                 {{successAlertMessage}}
             </b-alert>
+            <div v-if="showLoadingSpinner">
+                <b-spinner label="Loading..."></b-spinner>
+            </div>
 
             <b-card class="mt-3" header="Transaction management" v-if="showTransactionPanel">
                 <b-form @reset="onResetTransaction" @submit="onSubmitTransaction">
@@ -93,8 +74,11 @@
 </template>
 
 <script>
+    import Navbar from "./components/navbar";
+
     const axios = require('axios').default;
     export default {
+        components: {Navbar},
         data() {
             return {
                 config: {
@@ -116,6 +100,7 @@
                 successAlertMessage: '',
                 showTransactionPanel: true,
                 showBlockPanel: false,
+                showLoadingSpinner: false,
             }
         },
         mounted: function () {
@@ -144,6 +129,7 @@
             },
             onSubmitGetBaseFee(evt) {
                 evt.preventDefault();
+                //this.showLoadingSpinner = true;
                 console.log(this.formGetBaseFee.block.number);
                 const currentVue = this;
                 axios.get(`${this.config.apiGwRoot}/basefee/${this.formGetBaseFee.block.number}`)
@@ -152,6 +138,7 @@
                         console.log(response.data);
                         currentVue.result.getBaseFee.baseFee = response.data.baseFee;
                         currentVue.result.getBaseFee.displayBaseFee = true;
+                        //currentVue.showLoadingSpinner = false;
                     })
                     .catch(function (error) {
                         // handle error
@@ -165,6 +152,12 @@
             onNavToBlock() {
                 this.showTransactionPanel = false;
                 this.showBlockPanel = true;
+            },
+            onNavToExternalBlockExplorer() {
+                window.open("http://eip1559-testnet.ops.pegasys.tech:3000/", "_blank");
+            },
+            onNavToExternalNetworkStatus() {
+                window.open("http://eip1559-testnet.ops.pegasys.tech:3001/", "_blank");
             },
         }
     }
