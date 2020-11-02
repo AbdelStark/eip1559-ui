@@ -32,10 +32,29 @@
 <script>
     export default {
         name: "navbar",
-        props: [
-            "onNavToTransaction", "onNavToBlock", "onNavToExternalBlockExplorer", "onNavToExternalNetworkStatus",
-            "onNavToExternalEIPSpecification", "onNavToExternalEIPWorkUpdates", "onClickSettings"
-        ],
+        methods: {
+            onNavToTransaction() {
+                this.$store.commit('showTransactionPanel');
+            },
+            onNavToBlock() {
+                this.$store.commit('showBlockPanel');
+            },
+            onNavToExternalBlockExplorer() {
+                window.open("http://eip1559-testnet.ops.pegasys.tech:3000/", "_blank");
+            },
+            onNavToExternalNetworkStatus() {
+                window.open("http://eip1559-testnet.ops.pegasys.tech:3001/", "_blank");
+            },
+            onNavToExternalEIPSpecification() {
+                window.open("https://eips.ethereum.org/EIPS/eip-1559", "_blank");
+            },
+            onNavToExternalEIPWorkUpdates() {
+                window.open("https://hackmd.io/@timbeiko/1559-updates/", "_blank");
+            },
+            onClickSettings() {
+                this.$bvModal.show('modal-settings');
+            },
+        },
     }
 </script>
 

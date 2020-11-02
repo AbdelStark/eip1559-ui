@@ -7,6 +7,7 @@ import Vuex from 'vuex'
 import './plugins/bootstrap-vue'
 import App from './App.vue'
 import BaseFeeService from './service/BaseFeeService'
+import {newTransaction} from './util/transaction-util'
 
 Vue.config.productionTip = false;
 const store = new Vuex.Store({
@@ -14,6 +15,7 @@ const store = new Vuex.Store({
         show: show(),
         config: configuration(),
         userSettings: userSettings(),
+        formSubmitTransaction: formSubmitTransaction(),
     },
     mutations: {
         showBlockPanel(state) {
@@ -29,6 +31,9 @@ const store = new Vuex.Store({
         },
         hideTransactionPanel(state) {
             state.show.transactionPanel = false;
+        },
+        resetFormSubmitTransaction(state) {
+            state.formSubmitTransaction.transaction = newTransaction();
         }
     }
 });
@@ -65,4 +70,11 @@ function userSettings() {
         // default private key in genesis file
         privateKey: '8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63',
     }
+}
+
+function formSubmitTransaction() {
+    return {
+        privateKey: '',
+        transaction: newTransaction(),
+    };
 }
