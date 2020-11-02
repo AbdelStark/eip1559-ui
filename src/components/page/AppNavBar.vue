@@ -40,16 +40,16 @@
                 this.$store.commit('showBlockPanel');
             },
             onNavToExternalBlockExplorer() {
-                window.open("http://eip1559-testnet.ops.pegasys.tech:3000/", "_blank");
+                window.open(this.$store.state.config.links.blockExplorer, "_blank");
             },
             onNavToExternalNetworkStatus() {
-                window.open("http://eip1559-testnet.ops.pegasys.tech:3001/", "_blank");
+                window.open(this.$store.state.config.links.networkStatus, "_blank");
             },
             onNavToExternalEIPSpecification() {
-                window.open("https://eips.ethereum.org/EIPS/eip-1559", "_blank");
+                window.open(this.$store.state.config.links.eipSpecification, "_blank");
             },
             onNavToExternalEIPWorkUpdates() {
-                window.open("https://hackmd.io/@timbeiko/1559-updates/", "_blank");
+                window.open(this.$store.state.config.links.workUpdates, "_blank");
             },
             onClickSettings() {
                 this.$bvModal.show('modal-settings');

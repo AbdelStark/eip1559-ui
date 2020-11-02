@@ -7,7 +7,7 @@ export default class BaseFeeService {
 
     async getBaseFeeAt(blockNumber) {
         try {
-            const response = await axios.get(`${this.config.apiGwRoot}/${this.config.baseFeeEndpoint}/${blockNumber}`);
+            const response = await axios.get(`${this.config.apiGateway.rootEndpoint}/${this.config.apiGateway.baseFeeEndpoint}/${blockNumber}`);
             return response.data.baseFee;
         } catch (error) {
             console.log("error", error);

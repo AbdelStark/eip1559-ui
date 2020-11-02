@@ -8,12 +8,14 @@ import './plugins/bootstrap-vue'
 import App from './App.vue'
 import BaseFeeService from './service/BaseFeeService'
 import {newTransaction} from './util/transaction-util'
+import {GlobalConfiguration} from './config'
+import TransactionService from "./service/TransactionService";
 
 Vue.config.productionTip = false;
 const store = new Vuex.Store({
     state: {
         show: show(),
-        config: configuration(),
+        config: GlobalConfiguration(),
         userSettings: userSettings(),
         formSubmitTransaction: formSubmitTransaction(),
     },
@@ -35,6 +37,11 @@ const store = new Vuex.Store({
         resetFormSubmitTransaction(state) {
             state.formSubmitTransaction.transaction = newTransaction();
         }
+    },
+    getters: {
+        getTransactionExplorerLink: (state) => (hash) => {
+            return `${state.config.links.blockExplorer}tx/${hash}`;
+        }
     }
 });
 store.state.services = services(store.state.config);
@@ -42,15 +49,6 @@ new Vue({
     render: h => h(App),
     store,
 }).$mount('#app');
-
-function configuration() {
-    return {
-        apiGwRoot: 'http://eip1559-tx.ops.pegasys.tech:8080',
-        baseFeeEndpoint: 'basefee',
-        submitFrontierTransactionEndpoint: 'tx/legacy',
-        submitEIP1559TransactionEndpoint: 'tx/eip1559',
-    };
-}
 
 function show() {
     return {
@@ -62,6 +60,7 @@ function show() {
 function services(config) {
     return {
         baseFee: new BaseFeeService(config),
+        transaction: new TransactionService(config),
     };
 }
 
@@ -76,5 +75,8 @@ function formSubmitTransaction() {
     return {
         privateKey: '',
         transaction: newTransaction(),
+        result: {
+            transactionHash: '',
+        }
     };
 }
