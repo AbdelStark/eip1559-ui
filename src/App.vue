@@ -19,7 +19,7 @@
                 <b-spinner label="Loading..."></b-spinner>
             </div>
 
-            <b-card class="mt-3" header="Transaction management" v-if="showTransactionPanel">
+            <b-card class="mt-3" header="Transaction management" v-if="this.$store.state.show.transactionPanel">
                 <b-form @reset="onResetTransaction" @submit="onSubmitTransaction">
                     <b-form-group
                             id="input-group-private-key"
@@ -105,31 +105,7 @@
                     <b-button type="reset" variant="danger">Reset</b-button>
                 </b-form>
             </b-card>
-
-            <b-card class="mt-3" header="Block management" v-if="showBlockPanel">
-                <b-form>
-                    <b-form @submit="onSubmitGetBaseFee">
-                        <b-form-group
-                                id="input-group-block-number"
-                                label="Block number:"
-                                label-for="input-block-number"
-                        >
-                            <b-form-input
-                                    id="input-block-number"
-                                    placeholder="enter block number or one of earliest, latest"
-                                    required
-                                    v-model="formGetBaseFee.block.number"
-                            ></b-form-input>
-                        </b-form-group>
-                        <b-form-group>
-                            <b-button class="mr-2" type="submit" variant="primary">Get base fee</b-button>
-                            <h2 v-if="result.getBaseFee.displayBaseFee">
-                                <b-badge>{{result.getBaseFee.baseFee}}</b-badge>
-                            </h2>
-                        </b-form-group>
-                    </b-form>
-                </b-form>
-            </b-card>
+            <block-panel/>
             <b-alert dismissible v-model="showSuccessAlert" variant="success">
                 {{successAlertMessage}}
             </b-alert>
@@ -143,10 +119,12 @@
     import AppSettings from "./components/page/AppSettings";
     import AppFooter from "./components/page/AppFooter";
     import AppQrCode from "./components/page/AppQrCode";
+    import BlockPanel from "./components/core/BlockPanel";
 
     const axios = require('axios').default;
     export default {
         components: {
+            BlockPanel,
             AppQrCode,
             AppFooter,
             AppSettings,
@@ -154,24 +132,12 @@
         },
         data() {
             return {
-                config: configuration(),
                 formSubmitTransaction: {
                     privateKey: '',
                     transaction: newTransaction(),
                 },
-                formGetBaseFee: {
-                    block: newBlock(),
-                },
-                result: {
-                    getBaseFee: {
-                        displayBaseFee: false,
-                        baseFee: 0,
-                    }
-                },
                 showSuccessAlert: false,
                 successAlertMessage: '',
-                showTransactionPanel: true,
-                showBlockPanel: false,
                 showLoadingSpinner: false,
             }
         },
@@ -186,9 +152,9 @@
                 evt.preventDefault();
                 const requestPayload = transactionToRequestPayload(this.formSubmitTransaction.transaction);
                 console.log(requestPayload);
-                const txEndpoint = this.formSubmitTransaction.transaction.isEIP1559 ? this.config.submitEIP1559TransactionEndpoint : this.config.submitFrontierTransactionEndpoint;
+                const txEndpoint = this.formSubmitTransaction.transaction.isEIP1559 ? this.$store.state.config.submitEIP1559TransactionEndpoint : this.$store.state.config.submitFrontierTransactionEndpoint;
                 const currentVue = this;
-                axios.post(`${this.config.apiGwRoot}/${txEndpoint}/${this.formSubmitTransaction.privateKey}`, requestPayload)
+                axios.post(`${this.$store.state.config.apiGwRoot}/${txEndpoint}/${this.formSubmitTransaction.privateKey}`, requestPayload)
                     .then(function (response) {
                         currentVue.showSuccessAlert = true;
                         currentVue.successAlertMessage = response.data.transactionHash;
@@ -202,40 +168,19 @@
                 evt.preventDefault();
                 // Reset our form values
                 this.formSubmitTransaction.transaction = newTransaction();
-                this.formGetBaseFee.block = newBlock();
                 this.showSuccessAlert = false;
                 this.successAlertMessage = '';
                 // Trick to reset/clear native browser form validation state
-                this.showTransactionPanel = false;
+                this.$store.commit('hideTransactionPanel');
                 this.$nextTick(() => {
-                    this.showTransactionPanel = true;
+                    this.$store.commit('showTransactionPanel');
                 })
             },
-            onSubmitGetBaseFee(evt) {
-                evt.preventDefault();
-                //this.showLoadingSpinner = true;
-                console.log(this.formGetBaseFee.block.number);
-                const currentVue = this;
-                axios.get(`${this.config.apiGwRoot}/${this.config.baseFeeEndpoint}/${this.formGetBaseFee.block.number}`)
-                    .then(function (response) {
-                        // handle success
-                        console.log(response.data);
-                        currentVue.result.getBaseFee.baseFee = response.data.baseFee;
-                        currentVue.result.getBaseFee.displayBaseFee = true;
-                        //currentVue.showLoadingSpinner = false;
-                    })
-                    .catch(function (error) {
-                        // handle error
-                        console.log(error);
-                    });
-            },
             onNavToTransaction() {
-                this.showTransactionPanel = true;
-                this.showBlockPanel = false;
+                this.$store.commit('showTransactionPanel');
             },
             onNavToBlock() {
-                this.showTransactionPanel = false;
-                this.showBlockPanel = true;
+                this.$store.commit('showBlockPanel');
             },
             onChangeAutoNonce(autoNonce) {
                 if (autoNonce) {
@@ -271,21 +216,6 @@
             isEIP1559: false,
             minerBribe: '',
             feecap: '',
-        };
-    }
-
-    function newBlock() {
-        return {
-            number: 'latest',
-        };
-    }
-
-    function configuration() {
-        return {
-            apiGwRoot: 'http://eip1559-tx.ops.pegasys.tech:8080',
-            baseFeeEndpoint: 'basefee',
-            submitFrontierTransactionEndpoint: 'tx/legacy',
-            submitEIP1559TransactionEndpoint: 'tx/eip1559',
         };
     }
 
