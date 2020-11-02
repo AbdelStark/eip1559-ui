@@ -1,15 +1,15 @@
 <template>
     <div id="app">
         <navbar
+                :on-click-settings="onClickSettings"
                 :on-nav-to-block="onNavToBlock"
                 :on-nav-to-external-block-explorer="onNavToExternalBlockExplorer"
                 :on-nav-to-external-e-i-p-specification="onNavToExternalEIPSpecification"
                 :on-nav-to-external-e-i-p-work-updates="onNavToExternalEIPWorkUpdates"
                 :on-nav-to-external-network-status="onNavToExternalNetworkStatus"
                 :on-nav-to-transaction="onNavToTransaction"/>
-        <b-toast id="qrcode-toast" no-auto-hide static>
-            <img height="256" src="/qr-code.png" width="256">
-        </b-toast>
+        <app-qr-code/>
+        <app-settings/>
         <b-jumbotron header="EIP-1559 Toolbox" lead="Fee market change for ETH 1.0 chain">
             <p>
                 This EIP introduces a transaction pricing mechanism that includes fixed-per-block network fee that is
@@ -134,42 +134,23 @@
                 {{successAlertMessage}}
             </b-alert>
         </b-jumbotron>
-        <!-- Footer -->
-        <mdb-footer class="font-small pt-4 mt-4" color="blue">
-            <mdb-container class="text-left">
-                <mdb-row>
-                    <mdb-col class="mb-2">
-                        <a class="mr-2" href="https://github.com/abdelhamidbakhta/eip1559-ui"><img
-                                height="32" src="/logos/github.png" width="32"></a>
-                        <a class="mr-2" href="https://discord.gg/hrBUGu78Sf"><img height="32" src="/logos/discord.png"
-                                                                                  width="32"></a>
-                        <a class="mr-2" href="mailto:abdelhamid.bakhta@consensys.net"><img height="32"
-                                                                                           src="/logos/gmail.png" width="32"></a>
-                    </mdb-col>
-                </mdb-row>
-            </mdb-container>
-            <div class="footer-copyright text-center py-3">
-                <mdb-container fluid>
-                    &copy; 2020 Copyright: <a href="https://consensys.net/"> ConsenSys </a>
-                </mdb-container>
-            </div>
-        </mdb-footer>
-        <!-- Footer -->
+        <app-footer/>
     </div>
 </template>
 
 <script>
-    import Navbar from "./components/navbar";
-    import {mdbCol, mdbContainer, mdbFooter, mdbRow} from 'mdbvue';
+    import Navbar from "./components/page/Navbar";
+    import AppSettings from "./components/page/AppSettings";
+    import AppFooter from "./components/page/AppFooter";
+    import AppQrCode from "./components/page/AppQrCode";
 
     const axios = require('axios').default;
     export default {
         components: {
+            AppQrCode,
+            AppFooter,
+            AppSettings,
             Navbar,
-            mdbFooter,
-            mdbContainer,
-            mdbRow,
-            mdbCol
         },
         data() {
             return {
@@ -272,6 +253,9 @@
             },
             onNavToExternalEIPWorkUpdates() {
                 window.open("https://hackmd.io/@timbeiko/1559-updates/", "_blank");
+            },
+            onClickSettings() {
+                this.$bvModal.show('modal-settings');
             },
         }
     }

@@ -1,7 +1,10 @@
 <template>
     <b-navbar toggleable="lg" type="dark" variant="info">
-        <b-navbar-brand href="#">Ethereum</b-navbar-brand>
-
+        <b-navbar-brand href="#">
+            <b-button @click="onClickSettings" variant="light">
+                <b-icon aria-hidden="true" icon="gear-fill"></b-icon>
+            </b-button>
+        </b-navbar-brand>
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
         <b-collapse id="nav-collapse" is-nav>
@@ -29,7 +32,10 @@
 <script>
     export default {
         name: "navbar",
-        props: ["onNavToTransaction", "onNavToBlock", "onNavToExternalBlockExplorer", "onNavToExternalNetworkStatus", "onNavToExternalEIPSpecification", "onNavToExternalEIPWorkUpdates"],
+        props: [
+            "onNavToTransaction", "onNavToBlock", "onNavToExternalBlockExplorer", "onNavToExternalNetworkStatus",
+            "onNavToExternalEIPSpecification", "onNavToExternalEIPWorkUpdates", "onClickSettings"
+        ],
     }
 </script>
 
