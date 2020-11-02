@@ -13,6 +13,7 @@ const store = new Vuex.Store({
     state: {
         show: show(),
         config: configuration(),
+        userSettings: userSettings(),
     },
     mutations: {
         showBlockPanel(state) {
@@ -53,8 +54,15 @@ function show() {
     }
 }
 
-function services(config){
+function services(config) {
     return {
-      baseFee: new BaseFeeService(config),
+        baseFee: new BaseFeeService(config),
     };
+}
+
+function userSettings() {
+    return {
+        // default private key in genesis file
+        privateKey: '8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63',
+    }
 }

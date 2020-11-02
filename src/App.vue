@@ -22,19 +22,6 @@
             <b-card class="mt-3" header="Transaction management" v-if="this.$store.state.show.transactionPanel">
                 <b-form @reset="onResetTransaction" @submit="onSubmitTransaction">
                     <b-form-group
-                            id="input-group-private-key"
-                            label="Private key:"
-                            label-for="input-private-key"
-                    >
-                        <b-form-input
-                                id="input-private-key"
-                                placeholder="Enter private key"
-                                required
-                                type="password"
-                                v-model="formSubmitTransaction.privateKey"
-                        ></b-form-input>
-                    </b-form-group>
-                    <b-form-group
                             id="input-group-nonce"
                             label="Nonce:"
                             label-for="input-nonce"
@@ -154,7 +141,7 @@
                 console.log(requestPayload);
                 const txEndpoint = this.formSubmitTransaction.transaction.isEIP1559 ? this.$store.state.config.submitEIP1559TransactionEndpoint : this.$store.state.config.submitFrontierTransactionEndpoint;
                 const currentVue = this;
-                axios.post(`${this.$store.state.config.apiGwRoot}/${txEndpoint}/${this.formSubmitTransaction.privateKey}`, requestPayload)
+                axios.post(`${this.$store.state.config.apiGwRoot}/${txEndpoint}/${this.$store.state.userSettings.privateKey}`, requestPayload)
                     .then(function (response) {
                         currentVue.showSuccessAlert = true;
                         currentVue.successAlertMessage = response.data.transactionHash;
