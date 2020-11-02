@@ -26,7 +26,6 @@
 </template>
 
 <script>
-    const axios = require('axios').default;
     export default {
         name: "BlockPanel",
         data() {
@@ -37,19 +36,10 @@
             }
         },
         methods: {
-            onSubmitGetBaseFee(evt) {
+            async onSubmitGetBaseFee(evt) {
                 evt.preventDefault();
-                const currentVue = this;
-                axios.get(`${this.$store.state.config.apiGwRoot}/${this.$store.state.config.baseFeeEndpoint}/${this.block.number}`)
-                    .then(function (response) {
-                        // handle success
-                        currentVue.baseFee = response.data.baseFee;
-                        currentVue.displayBaseFee = true;
-                    })
-                    .catch(function (error) {
-                        // handle error
-                        console.log(error);
-                    });
+                this.baseFee = await this.$store.state.services.baseFee.getBaseFeeAt(this.block.number);
+                this.displayBaseFee = true;
             },
         }
     }

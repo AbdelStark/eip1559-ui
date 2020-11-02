@@ -6,6 +6,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import './plugins/bootstrap-vue'
 import App from './App.vue'
+import BaseFeeService from './service/BaseFeeService'
 
 Vue.config.productionTip = false;
 const store = new Vuex.Store({
@@ -30,6 +31,7 @@ const store = new Vuex.Store({
         }
     }
 });
+store.state.services = services(store.state.config);
 new Vue({
     render: h => h(App),
     store,
@@ -49,4 +51,10 @@ function show() {
         blockPanel: false,
         transactionPanel: true,
     }
+}
+
+function services(config){
+    return {
+      baseFee: new BaseFeeService(config),
+    };
 }
