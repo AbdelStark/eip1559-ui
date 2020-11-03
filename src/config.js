@@ -16,6 +16,13 @@ function GlobalConfiguration() {
             eipSpecification: 'https://eips.ethereum.org/EIPS/eip-1559',
             workUpdates: 'https://hackmd.io/@timbeiko/1559-updates/',
             joinTheTestnet: 'https://wiki.hyperledger.org/display/BESU/EIP-1559+testnet+guide',
+            resources: {
+                genesis: {
+                    besu: 'https://raw.githubusercontent.com/ConsenSys/eip1559-testnet/master/config/besu/genesis.json',
+                    geth: '',
+                    nethermind: '',
+                }
+            }
         }
     };
 }

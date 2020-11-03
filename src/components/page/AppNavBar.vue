@@ -21,6 +21,18 @@
                     <b-nav-item @click="onNavToExternalBlockExplorer" href="#">Block Explorer</b-nav-item>
                     <b-nav-item @click="onNavToExternalNetworkStatus" href="#">Network Status</b-nav-item>
                     <b-nav-item @click="onNavToExternalJoinTheTestnet" href="#">Join the Testnet</b-nav-item>
+                    <b-nav-item-dropdown right>
+                        <template #button-content>
+                            <em>Resources</em>
+                        </template>
+                        <b-dropdown-item @click="onNavToExternalResourcesBesuGenesis" href="#">Besu genesis file
+                        </b-dropdown-item>
+                        <b-dropdown-item @click="onNavToExternalResourcesGethGenesis" href="#">Geth genesis file
+                        </b-dropdown-item>
+                        <b-dropdown-item @click="onNavToExternalResourcesNethermindGenesis" href="#">Nethermind genesis
+                            file
+                        </b-dropdown-item>
+                    </b-nav-item-dropdown>
                     <b-button @click="$bvToast.show('qrcode-toast')" class="mb-2" variant="primary">
                         Get QR code
                     </b-button>
@@ -52,10 +64,22 @@
             onNavToExternalEIPWorkUpdates() {
                 window.open(this.$store.state.config.links.workUpdates, "_blank");
             },
-            onNavToExternalJoinTheTestnet(){
+            onNavToExternalJoinTheTestnet() {
                 window.open(this.$store.state.config.links.joinTheTestnet, "_blank");
             },
-            onClickSettings() {
+            onNavToExternalResourcesBesuGenesis() {
+                window.open(this.$store.state.config.links.resources.genesis.besu, "_blank");
+            },
+            onNavToExternalResourcesGethGenesis() {
+                window.open(this.$store.state.config.links.resources.genesis.geth, "_blank");
+            },
+            onNavToExternalResourcesNethermindGenesis() {
+                window.open(this.$store.state.config.links.resources.genesis.nethermind, "_blank");
+            },
+            async onClickSettings() {
+                if (this.$store.state.accounts == null) {
+                    this.$store.state.accounts = await this.$store.state.services.genesis.loadAccounts();
+                }
                 this.$bvModal.show('modal-settings');
             },
         },

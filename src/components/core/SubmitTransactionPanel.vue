@@ -90,6 +90,7 @@
         ]),
         methods: {
             async onSubmitTransaction(evt) {
+                console.log('privateKey: ', this.$store.state.userSettings.privateKey);
                 evt.preventDefault();
                 const transactionHash = await this.$store.state.services.transaction.submitTransaction(
                     this.formSubmitTransaction.transaction,

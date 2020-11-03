@@ -10,6 +10,7 @@ import BaseFeeService from './service/BaseFeeService'
 import {newTransaction} from './util/transaction-util'
 import {GlobalConfiguration} from './config'
 import TransactionService from "./service/TransactionService";
+import GenesisService from "./service/GenesisService";
 
 Vue.config.productionTip = false;
 const store = new Vuex.Store({
@@ -18,6 +19,7 @@ const store = new Vuex.Store({
         config: GlobalConfiguration(),
         userSettings: userSettings(),
         formSubmitTransaction: formSubmitTransaction(),
+        accounts: null,
     },
     mutations: {
         showBlockPanel(state) {
@@ -61,6 +63,7 @@ function services(config) {
     return {
         baseFee: new BaseFeeService(config),
         transaction: new TransactionService(config),
+        genesis: new GenesisService(config.links.resources.genesis.besu),
     };
 }
 
@@ -73,7 +76,7 @@ function userSettings() {
 
 function formSubmitTransaction() {
     return {
-        privateKey: '',
+        privateKey: null,
         transaction: newTransaction(),
         result: {
             transactionHash: '',
