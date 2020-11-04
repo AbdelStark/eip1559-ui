@@ -22,7 +22,6 @@
                                      v-model="formSubmitTransaction.transaction.autoNonce">Auto
                     </b-form-checkbox>
                 </b-form-group>
-
                 <b-form-group id="input-group-to" label="Recipient:" label-for="input-to">
                     <b-form-checkbox switch
                                      v-model="customRecipient">Custom
@@ -37,14 +36,17 @@
                     <b-form-select :options="accounts" class="mt-2" id="input-to" v-if="!customRecipient"
                                    v-model="formSubmitTransaction.transaction.to"></b-form-select>
                 </b-form-group>
-                <b-form-group id="input-group-value" label="Value:" label-for="input-value">
-                    <b-form-input
-                            id="input-value"
-                            required
-                            v-model="formSubmitTransaction.transaction.value"
-                    ></b-form-input>
-
-                </b-form-group>
+                <b-form inline>
+                    <b-form-group id="input-group-value" label="Value:" label-for="input-value">
+                        <b-form-input
+                                id="input-value"
+                                required
+                                v-model="formSubmitTransaction.transaction.value"
+                        ></b-form-input>
+                        <b-form-select :options="units"
+                                       v-model="formSubmitTransaction.transaction.valueUnit"></b-form-select>
+                    </b-form-group>
+                </b-form>
                 <b-form-checkbox size="lg" switch v-model="formSubmitTransaction.transaction.isEIP1559">EIP-1559
                 </b-form-checkbox>
                 <b-form-group label="Gas limit:" label-for="input-gas-limit">
@@ -54,30 +56,41 @@
                             v-model="formSubmitTransaction.transaction.gasLimit"
                     ></b-form-input>
                 </b-form-group>
-                <b-form-group label="Gas price:" label-for="input-gas-price">
-                    <b-form-input
-                            :disabled="formSubmitTransaction.transaction.isEIP1559"
-                            :required="!formSubmitTransaction.transaction.isEIP1559"
-                            id="input-gas-price"
-                            v-model="formSubmitTransaction.transaction.gasPrice"
-                    ></b-form-input>
-                </b-form-group>
-                <b-form-group label="Miner bribe:" label-for="input-miner-bribe">
-                    <b-form-input
-                            :disabled="!formSubmitTransaction.transaction.isEIP1559"
-                            :required="formSubmitTransaction.transaction.isEIP1559"
-                            id="input-miner-bribe"
-                            v-model="formSubmitTransaction.transaction.minerBribe"
-                    ></b-form-input>
-                </b-form-group>
-                <b-form-group label="Fee cap:" label-for="input-fee-cap">
-                    <b-form-input
-                            :disabled="!formSubmitTransaction.transaction.isEIP1559"
-                            :required="formSubmitTransaction.transaction.isEIP1559"
-                            id="input-fee-cap"
-                            v-model="formSubmitTransaction.transaction.feecap"
-                    ></b-form-input>
-                </b-form-group>
+                <b-form inline>
+                    <b-form-group label="Gas price:">
+                        <b-form-input
+                                :disabled="formSubmitTransaction.transaction.isEIP1559"
+                                :required="!formSubmitTransaction.transaction.isEIP1559"
+                                v-model="formSubmitTransaction.transaction.gasPrice"
+                        ></b-form-input>
+                        <b-form-select :options="units"
+                                       v-model="formSubmitTransaction.transaction.gasPriceUnit"></b-form-select>
+                    </b-form-group>
+                </b-form>
+                <b-form class="mt-2" inline>
+                    <b-form-group label="Miner bribe:" label-for="input-miner-bribe">
+                        <b-form-input
+                                :disabled="!formSubmitTransaction.transaction.isEIP1559"
+                                :required="formSubmitTransaction.transaction.isEIP1559"
+                                class="ml-2"
+                                id="input-miner-bribe"
+                                v-model="formSubmitTransaction.transaction.minerBribe"
+                        ></b-form-input>
+                        <b-form-select :options="units"
+                                       v-model="formSubmitTransaction.transaction.minerBribeUnit"></b-form-select>
+                    </b-form-group>
+                    <b-form-group class="ml-2" label="Fee cap:" label-for="input-fee-cap">
+                        <b-form-input
+                                :disabled="!formSubmitTransaction.transaction.isEIP1559"
+                                :required="formSubmitTransaction.transaction.isEIP1559"
+                                class="ml-2"
+                                id="input-fee-cap"
+                                v-model="formSubmitTransaction.transaction.feecap"
+                        ></b-form-input>
+                        <b-form-select :options="units"
+                                       v-model="formSubmitTransaction.transaction.feecapUnit"></b-form-select>
+                    </b-form-group>
+                </b-form>
 
                 <b-button class="mr-2" type="submit" variant="primary">Submit</b-button>
 
@@ -96,6 +109,11 @@
         data() {
             return {
                 customRecipient: false,
+                units: [
+                    {value: 'wei', text: 'Wei'},
+                    {value: 'gwei', text: 'Gwei'},
+                    {value: 'ether', text: 'Ether'},
+                ],
             }
         },
         async beforeMount() {
