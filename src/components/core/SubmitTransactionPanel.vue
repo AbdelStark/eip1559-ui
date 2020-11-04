@@ -24,12 +24,18 @@
                 </b-form-group>
 
                 <b-form-group id="input-group-to" label="Recipient:" label-for="input-to">
+                    <b-form-checkbox switch
+                                     v-model="customRecipient">Custom
+                    </b-form-checkbox>
                     <b-form-input
                             id="input-to"
                             placeholder="Enter recipient address"
                             required
+                            v-if="customRecipient"
                             v-model="formSubmitTransaction.transaction.to"
                     ></b-form-input>
+                    <b-form-select :options="accounts" class="mt-2" id="input-to" v-if="!customRecipient"
+                                   v-model="formSubmitTransaction.transaction.to"></b-form-select>
                 </b-form-group>
                 <b-form-group id="input-group-value" label="Value:" label-for="input-value">
                     <b-form-input
@@ -37,6 +43,7 @@
                             required
                             v-model="formSubmitTransaction.transaction.value"
                     ></b-form-input>
+
                 </b-form-group>
                 <b-form-checkbox size="lg" switch v-model="formSubmitTransaction.transaction.isEIP1559">EIP-1559
                 </b-form-checkbox>
@@ -82,15 +89,30 @@
 
 <script>
     import {mapState} from "vuex";
+    import {accountsToSelectAddressOptions} from "../../util/account";
 
     export default {
         name: "SubmitTransactionPanel",
-        computed: mapState([
-            'formSubmitTransaction'
-        ]),
+        data() {
+            return {
+                customRecipient: false,
+            }
+        },
+        async beforeMount() {
+            if (this.$store.state.accounts == null) {
+                this.$store.state.accounts = await this.$store.state.services.genesis.loadAccounts();
+            }
+        },
+        computed: {
+            accounts() {
+                return accountsToSelectAddressOptions(this.$store.state.accounts);
+            },
+            ...mapState([
+                'formSubmitTransaction',
+            ])
+        },
         methods: {
             async onSubmitTransaction(evt) {
-                console.log('privateKey: ', this.$store.state.userSettings.privateKey);
                 evt.preventDefault();
                 const transactionHash = await this.$store.state.services.transaction.submitTransaction(
                     this.formSubmitTransaction.transaction,

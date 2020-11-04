@@ -7,7 +7,7 @@ import Vuex from 'vuex'
 import './plugins/bootstrap-vue'
 import App from './App.vue'
 import BaseFeeService from './service/BaseFeeService'
-import {newTransaction} from './util/transaction-util'
+import {newTransaction} from './util/transaction'
 import {GlobalConfiguration} from './config'
 import TransactionService from "./service/TransactionService";
 import GenesisService from "./service/GenesisService";

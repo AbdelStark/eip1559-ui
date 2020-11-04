@@ -1,6 +1,5 @@
 <template>
     <b-modal id="modal-settings" title="Settings">
-        <h2>Toolbox configuration</h2>
         <b-form-group
                 id="input-group-private-key"
                 label="Private key:"
@@ -20,12 +19,26 @@
             <b-form-select :options="accounts" class="mt-2" v-if="!customPrivateKey"
                            v-model="userSettings.privateKey"></b-form-select>
         </b-form-group>
+        <b-form-group
+                id="input-group-tx-api-gw-endpoint"
+                label="Transaction API Gateway:"
+                label-for="input-tx-api-gw-endpoint"
+        >
+            <b-form-input
+                    id="input-tx-api-gw-endpoint"
+                    placeholder="Enter url"
+                    required
+                    type="url"
+                    v-model="config.apiGateway.rootEndpoint"
+            ></b-form-input>
+        </b-form-group>
     </b-modal>
 </template>
 
 <script>
 
     import {mapState} from "vuex";
+    import {accountsToSelectPrivateKeyOptions} from "../../util/account";
 
     export default {
         name: "settings",
@@ -37,20 +50,11 @@
         methods: {},
         computed: {
             accounts() {
-                const accountOptions = [];
-                const accounts = this.$store.state.accounts;
-                if (accounts != null) {
-                    accounts.forEach(account => {
-                        accountOptions.push({
-                            value: account.privateKey,
-                            text: account.address,
-                        });
-                    });
-                }
-                return accountOptions;
+                return accountsToSelectPrivateKeyOptions(this.$store.state.accounts);
             },
             ...mapState([
                 'userSettings',
+                'config',
             ])
         },
     }

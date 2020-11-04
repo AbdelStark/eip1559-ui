@@ -1,9 +1,6 @@
-module.exports = {
-    newTransaction,
-    transactionToRequestPayload,
-};
+import {hexStringWithPrefix} from './hex';
 
-function newTransaction() {
+export function newTransaction() {
     return {
         nonce: null,
         to: '',
@@ -17,9 +14,9 @@ function newTransaction() {
     };
 }
 
-function transactionToRequestPayload(tx) {
+export function transactionToRequestPayload(tx) {
     const requestPayload = {
-        to: tx.to,
+        to: hexStringWithPrefix(tx.to),
         value: tx.value,
         gasLimit: tx.gasLimit,
     };

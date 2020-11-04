@@ -1,4 +1,4 @@
-import {transactionToRequestPayload} from "../util/transaction-util";
+import {transactionToRequestPayload} from "../util/transaction";
 
 const axios = require('axios').default;
 
