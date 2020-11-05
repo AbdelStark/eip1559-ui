@@ -42,12 +42,12 @@ export function convert(from, fromUnit, toUnit) {
     return from;
 }
 
-export function weiToHumanFriendlyString(value){
-    if(value < 10000000){
+export function weiToHumanFriendlyString(value) {
+    if (value < 10000000) {
         return `${value} wei`;
-    }else if(value < 100000000000){
+    } else if (value < 100000000000) {
         return `${convert(value, 'wei', 'gwei')} gwei`;
-    }else{
+    } else {
         return `${convert(value, 'wei', 'ether')} eth`;
     }
 }
