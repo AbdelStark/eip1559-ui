@@ -17,7 +17,7 @@
                 </b-form-checkbox>
                 <b-button @click="onSeeLatestBlock" class="ml-2" variant="dark">
                     Base Fee
-                    <b-badge variant="light">{{currentBaseFee}}</b-badge>
+                    <b-badge variant="light">{{currentBaseFeeHumanFriendly}}</b-badge>
                 </b-button>
             </b-navbar-nav>
 
@@ -52,12 +52,14 @@
 
 <script>
     import {mapState} from "vuex";
+    import {weiToHumanFriendlyString} from "../../util/ether-unit";
 
     export default {
         name: "navbar",
         data() {
             return {
                 currentBaseFee: '0',
+                currentBaseFeeHumanFriendly: '0 wei',
                 timer: '',
             }
         },
@@ -77,6 +79,7 @@
             async refreshBaseFee() {
                 const baseFeeHex = await this.$store.state.services.baseFee.getLatestBaseFee();
                 this.currentBaseFee = parseInt(baseFeeHex, 16);
+                this.currentBaseFeeHumanFriendly = weiToHumanFriendlyString(this.currentBaseFee);
             },
             onNavToTransaction() {
                 this.$store.commit('showTransactionPanel');
