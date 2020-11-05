@@ -1,5 +1,5 @@
 <template>
-    <b-navbar toggleable="lg" type="dark" variant="info">
+    <b-navbar class="ml-auto" toggleable="lg" type="dark" variant="info">
         <b-navbar-brand href="#">
             <b-button @click="onClickSettings" variant="light">
                 <b-icon aria-hidden="true" icon="gear-fill"></b-icon>
@@ -11,6 +11,14 @@
             <b-navbar-nav>
                 <b-nav-item @click="onNavToTransaction" href="#">Transaction</b-nav-item>
                 <b-nav-item @click="onNavToBlock" href="#">Block</b-nav-item>
+                <b-form-checkbox button button-variant="light"
+                                 v-model="formSubmitTransaction.transaction.isEIP1559">
+                    Switch to {{!formSubmitTransaction.transaction.isEIP1559 ? '1559' : 'legacy'}}
+                </b-form-checkbox>
+                <b-button @click="onSeeLatestBlock" class="ml-2" variant="dark">
+                    Base Fee
+                    <b-badge variant="light">{{currentBaseFee}}</b-badge>
+                </b-button>
             </b-navbar-nav>
 
             <!-- Right aligned nav items -->
@@ -21,7 +29,7 @@
                     <b-nav-item @click="onNavToExternalBlockExplorer" href="#">Block Explorer</b-nav-item>
                     <b-nav-item @click="onNavToExternalNetworkStatus" href="#">Network Status</b-nav-item>
                     <b-nav-item @click="onNavToExternalJoinTheTestnet" href="#">Join the Testnet</b-nav-item>
-                    <!--b-nav-item-dropdown right>
+                    <b-nav-item-dropdown right>
                         <template #button-content>
                             <em>Resources</em>
                         </template>
@@ -32,9 +40,9 @@
                         <b-dropdown-item @click="onNavToExternalResourcesNethermindGenesis" href="#">Nethermind genesis
                             file
                         </b-dropdown-item>
-                    </b-nav-item-dropdown-->
-                    <b-button @click="$bvToast.show('qrcode-toast')" class="mb-2" variant="primary">
-                        Get QR code
+                    </b-nav-item-dropdown>
+                    <b-button @click="$bvToast.show('qrcode-toast')" class="mb-2" variant="light">
+                        QR code
                     </b-button>
                 </b-nav-form>
             </b-navbar-nav>
@@ -43,9 +51,33 @@
 </template>
 
 <script>
+    import {mapState} from "vuex";
+
     export default {
         name: "navbar",
+        data() {
+            return {
+                currentBaseFee: '0',
+                timer: '',
+            }
+        },
+        computed: {
+            ...mapState([
+                'formSubmitTransaction',
+            ])
+        },
+        created() {
+            this.refreshBaseFee();
+            this.timer = setInterval(this.refreshBaseFee, 2000)
+        },
+        beforeDestroy() {
+            clearInterval(this.timer)
+        },
         methods: {
+            async refreshBaseFee() {
+                const baseFeeHex = await this.$store.state.services.baseFee.getLatestBaseFee();
+                this.currentBaseFee = parseInt(baseFeeHex, 16);
+            },
             onNavToTransaction() {
                 this.$store.commit('showTransactionPanel');
             },
@@ -67,7 +99,7 @@
             onNavToExternalJoinTheTestnet() {
                 window.open(this.$store.state.config.links.joinTheTestnet, "_blank");
             },
-            /*onNavToExternalResourcesBesuGenesis() {
+            onNavToExternalResourcesBesuGenesis() {
                 window.open(this.$store.state.config.links.resources.genesis.besu, "_blank");
             },
             onNavToExternalResourcesGethGenesis() {
@@ -75,7 +107,10 @@
             },
             onNavToExternalResourcesNethermindGenesis() {
                 window.open(this.$store.state.config.links.resources.genesis.nethermind, "_blank");
-            },*/
+            },
+            onSeeLatestBlock() {
+                window.open(`${this.$store.state.config.links.blockExplorer}block/latest`, "_blank");
+            },
             async onClickSettings() {
                 if (this.$store.state.accounts == null) {
                     this.$store.state.accounts = await this.$store.state.services.genesis.loadAccounts();

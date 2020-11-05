@@ -1,5 +1,5 @@
 import 'bootstrap-css-only/css/bootstrap.min.css'
-import 'mdbvue/lib/css/mdb.min.css'
+//import 'mdbvue/lib/css/mdb.min.css'
 import '@babel/polyfill'
 import 'mutationobserver-shim'
 import Vue from 'vue'

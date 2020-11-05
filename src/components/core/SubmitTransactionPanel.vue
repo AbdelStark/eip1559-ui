@@ -4,17 +4,10 @@
             <h5> Transaction Hash: {{this.$store.state.formSubmitTransaction.result.transactionHash}} </h5>
             <b-button @click="onSeeBlockExplorer" variant="outline-primary">See in block explorer</b-button>
         </b-modal>
-        <b-button @click="onSeeLatestBlock" variant="warning">
-            Base Fee
-            <b-badge variant="light">{{currentBaseFee}}</b-badge>
-        </b-button>
-        <b-card class="mt-3" header="Transaction management" v-if="this.$store.state.show.transactionPanel">
+        <b-card bg-variant="dark" class="mt-3" header="Submit transaction"
+                text-variant="white" v-if="this.$store.state.show.transactionPanel">
             <b-form @reset="onResetTransaction" @submit="onSubmitTransaction">
-                <b-form-group
-                        id="input-group-nonce"
-                        label="Nonce:"
-                        label-for="input-nonce"
-                >
+                <b-input-group class="mt-3" prepend="Nonce">
                     <b-form-input
                             :disabled="formSubmitTransaction.transaction.autoNonce"
                             :required="!formSubmitTransaction.transaction.autoNonce"
@@ -22,14 +15,14 @@
                             placeholder="Enter nonce"
                             v-model="formSubmitTransaction.transaction.nonce"
                     ></b-form-input>
-                    <b-form-checkbox @change="onChangeAutoNonce" size="lg" switch
-                                     v-model="formSubmitTransaction.transaction.autoNonce">Auto
-                    </b-form-checkbox>
-                </b-form-group>
-                <b-form-group id="input-group-to" label="Recipient:" label-for="input-to">
-                    <b-form-checkbox switch
-                                     v-model="customRecipient">Custom
-                    </b-form-checkbox>
+                    <b-input-group-append>
+                        <b-form-checkbox @change="onChangeAutoNonce" class="ml-2" size="lg" switch
+                                         v-model="formSubmitTransaction.transaction.autoNonce">Auto
+                        </b-form-checkbox>
+                    </b-input-group-append>
+                </b-input-group>
+
+                <b-input-group class="mt-3" prepend="To">
                     <b-form-input
                             id="input-to"
                             placeholder="Enter recipient address"
@@ -37,75 +30,78 @@
                             v-if="customRecipient"
                             v-model="formSubmitTransaction.transaction.to"
                     ></b-form-input>
-                    <b-form-select :options="accounts" class="mt-2" id="input-to" v-if="!customRecipient"
+                    <b-form-select :options="accounts" id="input-to" v-if="!customRecipient"
                                    v-model="formSubmitTransaction.transaction.to"></b-form-select>
-                </b-form-group>
-                <b-form inline>
-                    <b-form-group id="input-group-value" label="Value:" label-for="input-value">
-                        <b-form-input
-                                id="input-value"
-                                class="ml-2"
-                                required
-                                v-model="formSubmitTransaction.transaction.value"
-                        ></b-form-input>
+                    <b-input-group-append>
+                        <b-form-checkbox class="ml-2" size="lg" switch
+                                         v-model="customRecipient">Custom
+                        </b-form-checkbox>
+                    </b-input-group-append>
+                </b-input-group>
+                <b-input-group class="mt-3" prepend="Value">
+                    <b-form-input
+                            id="input-value"
+                            required
+                            v-model="formSubmitTransaction.transaction.value"
+                    ></b-form-input>
+                    <b-input-group-append>
                         <b-form-select :options="units"
                                        class="mr-2"
                                        v-model="formSubmitTransaction.transaction.valueUnit"></b-form-select>
-                    </b-form-group>
-                    <b-form-group label="Gas limit:" label-for="input-gas-limit">
-                        <b-form-input
-                                class="ml-2"
-                                id="input-gas-limit"
-                                required
-                                v-model="formSubmitTransaction.transaction.gasLimit"
-                        ></b-form-input>
-                    </b-form-group>
-                </b-form>
-                <b-form-checkbox size="lg" switch v-model="formSubmitTransaction.transaction.isEIP1559">EIP-1559
-                </b-form-checkbox>
-                <b-form inline>
-                    <b-form-group label="Gas price:">
-                        <b-form-input
-                                :disabled="formSubmitTransaction.transaction.isEIP1559"
-                                :required="!formSubmitTransaction.transaction.isEIP1559"
-                                v-model="formSubmitTransaction.transaction.gasPrice"
-                        ></b-form-input>
+                    </b-input-group-append>
+                </b-input-group>
+                <b-input-group class="mt-3" prepend="Gas limit">
+                    <b-form-input
+                            id="input-gas-limit"
+                            required
+                            v-model="formSubmitTransaction.transaction.gasLimit"
+                    ></b-form-input>
+                </b-input-group>
+
+                <b-input-group class="mt-3" prepend="Gas Price" v-if="!formSubmitTransaction.transaction.isEIP1559">
+                    <b-form-input
+                            :disabled="formSubmitTransaction.transaction.isEIP1559"
+                            :required="!formSubmitTransaction.transaction.isEIP1559"
+                            v-model="formSubmitTransaction.transaction.gasPrice"
+                    ></b-form-input>
+                    <b-input-group-append>
                         <b-form-select :options="units"
                                        v-model="formSubmitTransaction.transaction.gasPriceUnit"></b-form-select>
-                    </b-form-group>
-                </b-form>
-                <b-form class="mt-2" inline>
-                    <b-form-group label="Miner bribe:" label-for="input-miner-bribe">
-                        <b-form-input
-                                :disabled="!formSubmitTransaction.transaction.isEIP1559"
-                                :required="formSubmitTransaction.transaction.isEIP1559"
-                                class="ml-2"
-                                id="input-miner-bribe"
-                                v-model="formSubmitTransaction.transaction.minerBribe"
-                        ></b-form-input>
+                    </b-input-group-append>
+                </b-input-group>
+                <b-input-group class="mt-3" prepend="Miner bribe" v-if="formSubmitTransaction.transaction.isEIP1559">
+                    <b-form-input
+                            :disabled="!formSubmitTransaction.transaction.isEIP1559"
+                            :required="formSubmitTransaction.transaction.isEIP1559"
+                            id="input-miner-bribe"
+                            v-model="formSubmitTransaction.transaction.minerBribe"
+                    ></b-form-input>
+                    <b-input-group-append>
                         <b-form-select :options="units"
                                        v-model="formSubmitTransaction.transaction.minerBribeUnit"></b-form-select>
-                    </b-form-group>
-                    <b-form-group class="ml-2" label="Fee cap:" label-for="input-fee-cap">
-                        <b-form-input
-                                :disabled="!formSubmitTransaction.transaction.isEIP1559"
-                                :required="formSubmitTransaction.transaction.isEIP1559"
-                                class="ml-2"
-                                id="input-fee-cap"
-                                v-model="formSubmitTransaction.transaction.feecap"
-                        ></b-form-input>
+                    </b-input-group-append>
+                </b-input-group>
+                <b-input-group class="mt-3" prepend="Fee cap" v-if="formSubmitTransaction.transaction.isEIP1559">
+                    <b-form-input
+                            :disabled="!formSubmitTransaction.transaction.isEIP1559"
+                            :required="formSubmitTransaction.transaction.isEIP1559"
+                            id="input-fee-cap"
+                            v-model="formSubmitTransaction.transaction.feecap"
+                    ></b-form-input>
+                    <b-input-group-append>
                         <b-form-select :options="units"
                                        v-model="formSubmitTransaction.transaction.feecapUnit"></b-form-select>
-                    </b-form-group>
-                    <b-button :disabled="!formSubmitTransaction.transaction.isEIP1559" @click="onEstimateFees"
-                              class="ml-2"
-                              variant="info">Estimate
-                    </b-button>
-                </b-form>
+                        <b-button @click="onEstimateFees" class="ml-2"
+                                  v-if="formSubmitTransaction.transaction.isEIP1559"
+                                  variant="info">Estimate
+                        </b-button>
+                    </b-input-group-append>
+                </b-input-group>
+                <b-form-group class="mt-2">
+                    <b-button class="mr-2" type="submit" variant="primary">Submit</b-button>
 
-                <b-button class="mr-2" type="submit" variant="primary">Submit</b-button>
-
-                <b-button type="reset" variant="danger">Reset</b-button>
+                    <b-button type="reset" variant="danger">Reset</b-button>
+                </b-form-group>
             </b-form>
         </b-card>
     </div>
@@ -121,8 +117,6 @@
         data() {
             return {
                 customRecipient: false,
-                currentBaseFee: '0',
-                timer: '',
                 units: [
                     {value: 'wei', text: 'Wei'},
                     {value: 'gwei', text: 'Gwei'},
@@ -144,18 +138,7 @@
                 'userSettings',
             ])
         },
-        created() {
-            this.refreshBaseFee();
-            this.timer = setInterval(this.refreshBaseFee, 2000)
-        },
-        beforeDestroy() {
-            clearInterval(this.timer)
-        },
         methods: {
-            async refreshBaseFee() {
-                const baseFeeHex = await this.$store.state.services.baseFee.getLatestBaseFee();
-                this.currentBaseFee = parseInt(baseFeeHex, 16);
-            },
             async onSubmitTransaction(evt) {
                 evt.preventDefault();
                 const transactionHash = await this.$store.state.services.transaction.submitTransaction(
