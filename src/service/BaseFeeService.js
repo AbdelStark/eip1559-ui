@@ -13,4 +13,13 @@ export default class BaseFeeService {
             console.log("error", error);
         }
     }
+
+    async getLatestBaseFee() {
+        try {
+            const response = await axios.get(`${this.config.apiGateway.rootEndpoint}/${this.config.apiGateway.baseFeeEndpoint}/latest`);
+            return response.data.baseFee;
+        } catch (error) {
+            console.log("error", error);
+        }
+    }
 }

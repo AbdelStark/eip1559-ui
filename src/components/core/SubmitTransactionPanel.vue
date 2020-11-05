@@ -4,6 +4,10 @@
             <h5> Transaction Hash: {{this.$store.state.formSubmitTransaction.result.transactionHash}} </h5>
             <b-button @click="onSeeBlockExplorer" variant="outline-primary">See in block explorer</b-button>
         </b-modal>
+        <b-button @click="onSeeLatestBlock" variant="warning">
+            Base Fee
+            <b-badge variant="light">{{currentBaseFee}}</b-badge>
+        </b-button>
         <b-card class="mt-3" header="Transaction management" v-if="this.$store.state.show.transactionPanel">
             <b-form @reset="onResetTransaction" @submit="onSubmitTransaction">
                 <b-form-group
@@ -90,6 +94,9 @@
                         <b-form-select :options="units"
                                        v-model="formSubmitTransaction.transaction.feecapUnit"></b-form-select>
                     </b-form-group>
+                    <b-button :disabled="!formSubmitTransaction.transaction.isEIP1559" @click="onEstimateFees" class="ml-2"
+                              variant="info">Estimate
+                    </b-button>
                 </b-form>
 
                 <b-button class="mr-2" type="submit" variant="primary">Submit</b-button>
@@ -103,12 +110,15 @@
 <script>
     import {mapState} from "vuex";
     import {accountsToSelectAddressOptions} from "../../util/account";
+    import {convert} from "../../util/ether-unit";
 
     export default {
         name: "SubmitTransactionPanel",
         data() {
             return {
                 customRecipient: false,
+                currentBaseFee: '0',
+                timer: '',
                 units: [
                     {value: 'wei', text: 'Wei'},
                     {value: 'gwei', text: 'Gwei'},
@@ -127,9 +137,21 @@
             },
             ...mapState([
                 'formSubmitTransaction',
+                'userSettings',
             ])
         },
+        created() {
+            this.refreshBaseFee();
+            this.timer = setInterval(this.refreshBaseFee, 2000)
+        },
+        beforeDestroy() {
+            clearInterval(this.timer)
+        },
         methods: {
+            async refreshBaseFee() {
+                const baseFeeHex = await this.$store.state.services.baseFee.getLatestBaseFee();
+                this.currentBaseFee = parseInt(baseFeeHex, 16);
+            },
             async onSubmitTransaction(evt) {
                 evt.preventDefault();
                 const transactionHash = await this.$store.state.services.transaction.submitTransaction(
@@ -155,12 +177,35 @@
                     this.formSubmitTransaction.transaction.nonce = '';
                 }
             },
+            onSeeLatestBlock() {
+                window.open(`${this.$store.state.config.links.blockExplorer}block/latest`, "_blank");
+            },
             onSeeBlockExplorer() {
                 const txExplorerLink = this.$store.getters.getTransactionExplorerLink(
                     this.$store.state.formSubmitTransaction.result.transactionHash
                 );
                 window.open(txExplorerLink, "_blank");
-            }
+            },
+            async onEstimateFees() {
+                console.log('estimating transaction fees parameters');
+                const baseFeeHex = await this.$store.state.services.baseFee.getLatestBaseFee();
+                const baseFee = parseInt(baseFeeHex, 16);
+                console.log('current baseFee: ', baseFee);
+                this.formSubmitTransaction.transaction.minerBribe = this.userSettings.fees.estimate.defaultMinerBribe;
+                this.formSubmitTransaction.transaction.minerBribeUnit = this.userSettings.fees.estimate.defaultMinerBribeUnit;
+                const convertedBaseFee = convert(baseFee, 'wei', this.formSubmitTransaction.transaction.feecapUnit);
+                const convertedMinerBribe = convert(this.formSubmitTransaction.transaction.minerBribe, this.formSubmitTransaction.transaction.minerBribeUnit, this.formSubmitTransaction.transaction.feecapUnit);
+                console.log('converted baseFee:', convertedBaseFee);
+                const convertedFeeCapMargin = convert(
+                    this.userSettings.fees.estimate.defaultFeeCapMargin,
+                    this.userSettings.fees.estimate.defaultFeeCapMarginUnit,
+                    this.formSubmitTransaction.transaction.feecapUnit
+                );
+                console.log('converted feeCap margin:', convertedFeeCapMargin);
+                const feeCap = convertedBaseFee + convertedMinerBribe + convertedFeeCapMargin;
+                console.log('estimated feeCap: ', feeCap);
+                this.formSubmitTransaction.transaction.feecap = feeCap;
+            },
         }
     }
 </script>

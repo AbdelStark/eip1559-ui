@@ -71,6 +71,14 @@ function userSettings() {
     return {
         // default private key in genesis file
         privateKey: '8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63',
+        fees: {
+            estimate: {
+                defaultMinerBribe: 1,
+                defaultMinerBribeUnit: 'gwei',
+                defaultFeeCapMargin: 0.5,
+                defaultFeeCapMarginUnit: 'gwei',
+            }
+        },
     }
 }
 

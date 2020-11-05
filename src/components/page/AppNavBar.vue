@@ -21,7 +21,7 @@
                     <b-nav-item @click="onNavToExternalBlockExplorer" href="#">Block Explorer</b-nav-item>
                     <b-nav-item @click="onNavToExternalNetworkStatus" href="#">Network Status</b-nav-item>
                     <b-nav-item @click="onNavToExternalJoinTheTestnet" href="#">Join the Testnet</b-nav-item>
-                    <b-nav-item-dropdown right>
+                    <!--b-nav-item-dropdown right>
                         <template #button-content>
                             <em>Resources</em>
                         </template>
@@ -32,7 +32,7 @@
                         <b-dropdown-item @click="onNavToExternalResourcesNethermindGenesis" href="#">Nethermind genesis
                             file
                         </b-dropdown-item>
-                    </b-nav-item-dropdown>
+                    </b-nav-item-dropdown-->
                     <b-button @click="$bvToast.show('qrcode-toast')" class="mb-2" variant="primary">
                         Get QR code
                     </b-button>
@@ -67,7 +67,7 @@
             onNavToExternalJoinTheTestnet() {
                 window.open(this.$store.state.config.links.joinTheTestnet, "_blank");
             },
-            onNavToExternalResourcesBesuGenesis() {
+            /*onNavToExternalResourcesBesuGenesis() {
                 window.open(this.$store.state.config.links.resources.genesis.besu, "_blank");
             },
             onNavToExternalResourcesGethGenesis() {
@@ -75,7 +75,7 @@
             },
             onNavToExternalResourcesNethermindGenesis() {
                 window.open(this.$store.state.config.links.resources.genesis.nethermind, "_blank");
-            },
+            },*/
             async onClickSettings() {
                 if (this.$store.state.accounts == null) {
                     this.$store.state.accounts = await this.$store.state.services.genesis.loadAccounts();

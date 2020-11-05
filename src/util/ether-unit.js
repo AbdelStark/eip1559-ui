@@ -15,3 +15,29 @@ export function toWei(value, unit) {
             return value * ETH_MULTIPLIER;
     }
 }
+
+export function convert(from, fromUnit, toUnit) {
+    if (fromUnit === toUnit) {
+        return from;
+    }
+    if (fromUnit === UNIT_WEI) {
+        if (toUnit === UNIT_GWEI) {
+            return from / GWEI_MULTIPLIER;
+        } else if (toUnit === UNIT_ETHER) {
+            return from / ETH_MULTIPLIER;
+        }
+    } else if (fromUnit === UNIT_GWEI) {
+        if (toUnit === UNIT_WEI) {
+            return from * GWEI_MULTIPLIER;
+        } else if (toUnit === UNIT_ETHER) {
+            return from / GWEI_MULTIPLIER;
+        }
+    } else if (fromUnit === UNIT_ETHER) {
+        if (toUnit === UNIT_WEI) {
+            return from * ETH_MULTIPLIER;
+        } else if (toUnit === UNIT_GWEI) {
+            return from * GWEI_MULTIPLIER;
+        }
+    }
+    return from;
+}
