@@ -44,22 +44,25 @@
                     <b-form-group id="input-group-value" label="Value:" label-for="input-value">
                         <b-form-input
                                 id="input-value"
+                                class="ml-2"
                                 required
                                 v-model="formSubmitTransaction.transaction.value"
                         ></b-form-input>
                         <b-form-select :options="units"
+                                       class="mr-2"
                                        v-model="formSubmitTransaction.transaction.valueUnit"></b-form-select>
+                    </b-form-group>
+                    <b-form-group label="Gas limit:" label-for="input-gas-limit">
+                        <b-form-input
+                                class="ml-2"
+                                id="input-gas-limit"
+                                required
+                                v-model="formSubmitTransaction.transaction.gasLimit"
+                        ></b-form-input>
                     </b-form-group>
                 </b-form>
                 <b-form-checkbox size="lg" switch v-model="formSubmitTransaction.transaction.isEIP1559">EIP-1559
                 </b-form-checkbox>
-                <b-form-group label="Gas limit:" label-for="input-gas-limit">
-                    <b-form-input
-                            id="input-gas-limit"
-                            required
-                            v-model="formSubmitTransaction.transaction.gasLimit"
-                    ></b-form-input>
-                </b-form-group>
                 <b-form inline>
                     <b-form-group label="Gas price:">
                         <b-form-input
@@ -94,7 +97,8 @@
                         <b-form-select :options="units"
                                        v-model="formSubmitTransaction.transaction.feecapUnit"></b-form-select>
                     </b-form-group>
-                    <b-button :disabled="!formSubmitTransaction.transaction.isEIP1559" @click="onEstimateFees" class="ml-2"
+                    <b-button :disabled="!formSubmitTransaction.transaction.isEIP1559" @click="onEstimateFees"
+                              class="ml-2"
                               variant="info">Estimate
                     </b-button>
                 </b-form>
