@@ -75,7 +75,7 @@ function userSettings() {
             estimate: {
                 defaultMinerBribe: 1,
                 defaultMinerBribeUnit: 'gwei',
-                defaultFeeCapMargin: 0.5,
+                defaultFeeCapMargin: 5,
                 defaultFeeCapMarginUnit: 'gwei',
             }
         },
